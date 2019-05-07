@@ -1,6 +1,13 @@
+let numOfW = 30;
 let designsArr = [];
+let once = true;
+let count = 0;
+//gradient
 
-class windmill{
+
+
+
+class windmill{ //create windmill class
     constructor(bounds_x, bounds_y, max_Ang, padding){
         this.bounds_x = bounds_x;
         this.bounds_y = bounds_y;
@@ -20,15 +27,11 @@ class windmill{
     getAng(){
         return this.ang;
     }
-    mutateW(){
-        this.X = Math.random()*this.bounds_x+this.padding;
-        this.Y = Math.random()*this.bounds_y+this.padding;
-        this.ang = (Math.random()-0.5)*this.max_Ang;
-    }
+   
     getPower(){
-        let color = get(this.X, this.Y-10)[2];
+        let color2 = get(this.X, this.Y-10)[2];
 
-        let power = 1+((50-color)/205);
+        let power = 1+((50-color2)/205);
        
         power -= 0.6*Math.abs(this.ang);
         
@@ -38,10 +41,8 @@ class windmill{
 class design{
     constructor(max_num){
 
-        this.num = Math.floor(Math.random()*max_num);
-        if(this.num%2!=0){
-            this.num++;
-        }
+        this.num = max_num;
+       
         //console.log(this.num);
         this.windmills = [];
         for(let i =0; i<this.num; i++){
@@ -56,6 +57,8 @@ class design{
         console.log(this.num);
     }
     drawDesign(){
+        let c1 = color(0, 0, 200);
+        let c2 = color(50, 50, 50);
         noStroke();
     createCanvas(800,800);
     // now the first two arguments of a rect are its center point, not corner
@@ -68,43 +71,51 @@ class design{
               translate(this.windmills[i].getX(), this.windmills[i].getY());
               rotate(this.windmills[i].getAng());
               fill(230);
-            //  triangle(0, 0, -15, 30, 15, 30);
               ellipse(0,0,55,15);
               rectMode(CENTER);	
               rect(0,15,20,20);
-      
+              
               fill(0,0,200,171);
-              rect(0,510,55,1000);
+             // rect(0,510,55,1000);
+              
+              quad(30,0,-30,0,-1,1000,1,1000);
               translate(-this.windmills[i].getX(), -this.windmills[i].getY());
-             // rotate(-windmills[i].getAng());
              pop();
-             // console.log(this.windmills[i].getX(), this.windmills[i].getY());
-              //console.log(this.windmills[i].getAng());
+             
           }
-          //console.log(get(400, 300));
       
-          fill(get(400, 300));
-          rect(50,50,40,40);
+        
       
     }
     getDNA(){
         return this.windmills;
     }
     mate(partnerDes){
-        let length1 = Math.floor(Math.random()*this.windmills.length);
-        let length2 = Math.floor(Math.random()*partnerDes.getDNA().length);
+        
+        let temp1 = new design(4);
+        let temp2 = new design(4);
+        temp1.copy(this.windmills.slice(0,19).concat(partnerDes.getDNA().slice(19,39)));
+        temp2.copy(partnerDes.getDNA().slice(0,19).concat(this.windmills.slice(19,39)));
+        console.log("section");
         return{
-            child1: new design(this.windmills.slice(0,length1).concat(partnerDes.getDNA().slice(length1, partnerDes.getDNA.length))),
-            child2: new design(partnerDes.getDNA().slice(0,length2).concat(this.windmills.slice(length2, this.windmills.length))) 
+            child1: temp1,
+            child2: temp2 
         }
     }
     mutate(){
         for(let i = 0; i<this.windmills.length; i++){
+         
             if(Math.random()>0.8){
-                this.windmills[i].mutateW();
+                
+                this.windmills[i] = new windmill(600,600,0.5, 100);
+                
               
             }
+
         }
+        let temp = new design(numOfW);
+        temp.copy(this.windmills);
+        return temp;
 
     }
     getFitness(){
@@ -116,6 +127,9 @@ class design{
             totalCost++;
            
         }
+        if(this.windmills.length<15){
+            return 0;
+        }
      
         return totalPow/totalCost;
     }
@@ -123,17 +137,19 @@ class design{
 }
 function createDesigns(numDes){
     for(let i =0; i<numDes; i++){
-        designsArr.push(new design(20));
+        designsArr.push(new design(numOfW));
     }
    
 }
 function runNextGen(){
+   count++;
+   document.getElementById("count").innerHTML = count;
+
     console.log(designsArr);
     let fitnessArr = [];
     let matingPool = [];
-    let maxFitness = 0;
-    let minMax = 0;
-    let count = 0;
+    let maxFitnessNum = 0;
+  
     for(let i =0; i<designsArr.length; i++){
         designsArr[i].drawDesign();
         let tempFit = designsArr[i].getFitness();
@@ -142,34 +158,66 @@ function runNextGen(){
     }
     clear();
     fitnessArr.sort(function(a, b){return b - a});
-    for(let i = 0; i<designsArr.length/2; i++){
+    for(let i = 0; i<designsArr.length; i++){
         designsArr[i].drawDesign();
         let tempFit = designsArr[i].getFitness();
-        console.log(designsArr.length/2);
-        if(tempFit>fitnessArr[designsArr.length/2]){
+        
+        if(tempFit>=fitnessArr[20]){
             matingPool.push(designsArr[i]);
         }
         clear();
-        console.log("MaxFitness"+fitnessArr[0]);
-        if(tempFit===fitnessArr[0]){
-            console.log("New Alpha");
-            designsArr[i].drawDesign();
+        console.log("fitnessArr");
+        console.log(fitnessArr);
+        if(tempFit>fitnessArr[2]){
+            maxFitnessNum = i;
         }
     }
-    
+    if(once){
+        document.getElementById("disp2").innerHTML = "initial fitness: "+fitnessArr[0];
+        once = false;
+    }
+    document.getElementById("disp").innerHTML = "final fitness: "+fitnessArr[0];
+    designsArr[maxFitnessNum].drawDesign();
     designsArr = [];
+    console.log("mating pool");
     console.log(matingPool);
-    for(let i = 0; i<matingPool.length; i++){
+    while(matingPool.length>21){
+        matingPool.pop();
+    }
+    while(matingPool.length<21){
+        matingPool.push(new design(40));
+    }
+    for(let i = 0; i<(matingPool.length-1); i++){
         console.log("mating");
-        let offspring =matingPool[i].mate(new design(matingPool[i+1]));
-        console.log(offspring.child1);
+        let temp = new design(4);
+        let num2 = i+1;
+        temp.copy(matingPool[num2].getDNA());
+        let offspring = matingPool[i].mate(temp);
+        console.log("offspring");
+        console.log(offspring.child1.mutate());
         designsArr.push(offspring.child1.mutate());
         designsArr.push(offspring.child2.mutate());
         
     }
+    console.log("new desings");
     console.log(designsArr);
 
     
+}
+function run100Gen(){
+    for(let i = 0; i<100; i++){
+        runNextGen();
+        count++;
+        document.getElementById("count").innerHTML = count;
+    }
+}
+let desCounter = 0;
+function showOtherDes(){
+    if(desCounter === 39){
+        desCounter = 0;
+    }
+    designsArr[desCounter].drawDesign();
+    desCounter++;
 }
 async function setup(){
    // pixelDensity(4.7); //makes it high res
@@ -184,7 +232,7 @@ async function setup(){
     temp2.drawDesign();
     console.log("adasdas"+temp2.getFitness());
     */
-   createDesigns(16);
+   createDesigns(40);
     
   }
  
