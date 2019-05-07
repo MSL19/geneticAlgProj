@@ -1,3 +1,12 @@
+/**
+ * Name: Max Lewis
+ * Project Name: AI Project #2
+ * Purpose: 
+ * Us genetic algorithims to oganize windmills to optimize effeciency
+ * Date: 4/15/19
+ * Collaborators: None
+ */
+
 let numOfW = 30;
 let designsArr = [];
 let once = true;
@@ -28,7 +37,7 @@ class windmill{ //create windmill class
         return this.ang;
     }
    
-    getPower(){
+    getPower(){ //fitness for individual windmills
         let color2 = get(this.X, this.Y-10)[2];
 
         let power = 1+((50-color2)/205);
@@ -38,7 +47,7 @@ class windmill{ //create windmill class
         return power;
     }
 }
-class design{
+class design{ //design class is a array of windmills
     constructor(max_num){
 
         this.num = max_num;
@@ -90,7 +99,7 @@ class design{
     getDNA(){
         return this.windmills;
     }
-    mate(partnerDes){
+    mate(partnerDes){ //mate with another design
         
         let temp1 = new design(4);
         let temp2 = new design(4);
@@ -102,7 +111,7 @@ class design{
             child2: temp2 
         }
     }
-    mutate(){
+    mutate(){ //mutate the DNA of the design
         for(let i = 0; i<this.windmills.length; i++){
          
             if(Math.random()>0.8){
@@ -118,7 +127,7 @@ class design{
         return temp;
 
     }
-    getFitness(){
+    getFitness(){ //get the fitness for each windmill and add them up
         
         let totalPow = 0;
         let totalCost = 0
@@ -131,11 +140,11 @@ class design{
             return 0;
         }
      
-        return totalPow/totalCost;
+        return totalPow;
     }
 
 }
-function createDesigns(numDes){
+function createDesigns(numDes){ //create x number of designs to create a population
     for(let i =0; i<numDes; i++){
         designsArr.push(new design(numOfW));
     }
@@ -143,7 +152,7 @@ function createDesigns(numDes){
 }
 function runNextGen(){
    count++;
-   document.getElementById("count").innerHTML = count;
+   document.getElementById("count").innerHTML = "generations: "+count; //update html
 
     console.log(designsArr);
     let fitnessArr = [];
@@ -220,18 +229,7 @@ function showOtherDes(){
     desCounter++;
 }
 async function setup(){
-   // pixelDensity(4.7); //makes it high res
-    //fullScreen();
-    
-   /* let temp = new design(10);
-    temp.drawDesign();
-    let temp2 = new design(10);
-    console.log(temp2);
-    temp2.copy(temp.getDNA());
-    temp2.mutate();
-    temp2.drawDesign();
-    console.log("adasdas"+temp2.getFitness());
-    */
+   
    createDesigns(40);
     
   }
