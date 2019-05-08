@@ -31,4 +31,13 @@ sketch2.js:
 **How to Run:**
 
 -open index.html in Chrome
+
 -Or go to https://msl19.github.io/geneticAlgProj/
+
+**What it should look like when running**
+
+![](/Capture2.PNG)
+
+**Sources**
+
+By now I have become pretty confortable making my own genetic algorithms, but in the past The Coding Train has been instrumental in teaching me to understand them. Inspiration for this project came from visiting NREL (National Renewable Energy Laboratory) and seeing their wind farm simulations. 
